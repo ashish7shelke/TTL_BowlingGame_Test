@@ -3,7 +3,7 @@
 #define BOWLING_GAME_HPP
 
 #include <string>
-
+#include <vector>
 #include "Bowling_Roll.hpp"
 
 using namespace std;
@@ -19,6 +19,7 @@ public:
 
     // Function to add a roll to the game
     void addRoll(const string pinsCharSequence);
+    void addRoll(const std::vector<int>& pinsIntSequence);
 
     // Function to get the total score of the game
     int getTotalScore() const;
