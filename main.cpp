@@ -1,121 +1,102 @@
 #include <iostream>
 #include <vector>
+#include <string>
 #include "Bowling_Game.hpp"
-
 using namespace std;
 
-int runProgramCharSequence();
-int runProgramIntegerSequence();
+void runProgramIntegerSequence();
 
 int main() {
-
 	runProgramIntegerSequence();	
-
 	return 0;
 }
 
-int runProgramIntegerSequence()
+void runProgramIntegerSequence()
 {
-   std::vector<int> sequence;
-    BowlingGame *game;
+     std::vector<int> sequence;
     std::string input;
 
     try
     {
         while (input != "q") {
-            cout << endl << "TTL :: BOWLING GAME" << endl << endl;
-        
-            cout << "Press 'n' new sequence, 'd' for default TEST Sequence, 'q' to quit" << endl << endl;
+            std::cout << std::endl << "TTL :: BOWLING GAME" << std::endl << std::endl;
+            std::cout << "Press 'n' new sequence, 'd' for default TEST Sequence, 'q' to quit" << std::endl << std::endl;
 
             sequence.clear();
             input.clear();
             std::getline(std::cin, input);
 
             if (input == "d") {
-                sequence = {1,4,4,5,6,0,5,5,10,0,1,7,3,6,4,10,2,8,6}; // Default sequence for testing
+                sequence = {1,4,4,5,6,4,5,5,10,0,1,7,3,6,4,10,2,8,6}; // Default sequence for testing
             } else if (input == "q") {
-                cout << endl << "Closing the bowling !!!" << endl << endl;
+                std::cout << std::endl << "Closing the bowling !!!" << std::endl << std::endl;
                 break;
-            } else if (input == "n"){
-                int frame = 0;
-                int rollInFrame = 0;
+            } else if (input == "n") {
+                int frame = 1;
+                bool firstRoll = true, tenthFrame = false;
                 int prevRoll = 0;
-                bool tenthFrame = false;
-                int rollsInTenth = 0;
-                while (frame < 10) {
+                int rollsInTenth = 1;
+                int tenthFirst = 0, tenthSecond = 0;
+
+                while (frame <= 10) {
                     int num;
-                    cout << "Frame No :: " << frame + 1  <<"\tEnter roll #" << rollInFrame + 1 << ": ";
-                    cin >> num;
+                    std::cout << "Frame No :: " << frame << "\tEnter roll #" << (!tenthFrame ? (firstRoll ? 1 : 2) : rollsInTenth) << ": ";
+                    std::cin >> num;
                     if (num < 0 || num > 10) {
-                        cout << "Invalid entry: " << num << ". Each roll must be between 0 and 10." << endl;
+                        std::cout << "Invalid entry: " << num << ". Each roll must be between 0 and 10." << std::endl;
                         continue;
                     }
-                    // Frame sum validation (except 10th frame)
-                    if (frame < 9) {
-                        if (rollInFrame == 1) {
+                    if (frame < 10) {
+                        if (firstRoll) {
+                            prevRoll = num;
+                            sequence.push_back(num);
+                            if (num == 10) { // Strike
+                                frame++;
+                            } else {
+                                firstRoll = false;
+                            }
+                        } else {
                             if (prevRoll + num > 10) {
-                                cout << "Invalid frame: sum of two rolls in frame " << (frame + 1)
-                                     << " is greater than 10 (" << prevRoll << " + " << num << "). ...RETRY..." << endl;
+                                std::cout << "Invalid frame: sum of two rolls in frame " << frame
+                                          << " is greater than 10 (" << prevRoll << " + " << num << "). ...RETRY..." << std::endl;
                                 continue;
                             }
-                        }
-                        if (num == 10 && rollInFrame == 0) { // Strike
                             sequence.push_back(num);
                             frame++;
-                            rollInFrame = 0;
-                            continue;
-                        } else if (rollInFrame == 0) {
-                            prevRoll = num;
-                            rollInFrame = 1;
-                        } else {
-                            rollInFrame = 0;
-                            frame++;
+                            firstRoll = true;
                         }
                     } else { // 10th frame logic
-                        if (!tenthFrame) {
-                            tenthFrame = true;
-                            rollsInTenth = 1;
-							rollInFrame++;
-						} else {
-							rollsInTenth++;
-							rollInFrame++;
-						}
-                        // Allow up to 3 rolls in 10th frame if strike or spare
+                        tenthFrame = true; 
+                        sequence.push_back(num);
+                        if (rollsInTenth == 1) {
+                            tenthFirst = num;
+                            firstRoll = false;
+                        } else if (rollsInTenth == 2) {
+                            tenthSecond = num;
+                            if (tenthFirst == 10 || ((tenthFirst + tenthSecond) < 10)) {
+                                // Open 10th frame, only two rolls allowed
+                                break;
+                            }
+                        } else if (rollsInTenth == 3) {
+                            // Max three rolls in 10th frame
+                            tenthFrame = false;
+                            break; 
+                        }
+                        rollsInTenth++;
 
-                        if ((rollsInTenth == 2) && ( (sequence[sequence.size()-1] == 10)  || (sequence[sequence.size()-1] + num != 10) ) ) {
-                            // Open frame, only 2 rolls
-							
-                            sequence.push_back(num);
-                            break;
-                        }
-                        if (rollsInTenth == 3) {
-							rollInFrame = 0;
-                            sequence.push_back(num);
-                            break;
-                        }
                     }
-                    sequence.push_back(num);
                 }
             }
-			else
-			{
-				cout << endl << "Invalid Command : Closing the bowling !!!" << endl << endl;
-				return -1;
-			}
+            else
+            {
+                std::cout << std::endl << "Invalid Command : Closing the bowling !!!" << std::endl << std::endl;
+                return;
+            }
 
             if (!sequence.empty()) {
-                game = new BowlingGame();
-
-                if(nullptr == game) {
-                    cout << "Memory allocation failed for BowlingGame." << endl;
-                    return 1;
-                }
-
-                game->addRoll(sequence); // You need to implement this overload
-
-                cout << endl << "Your Final score is " << game->getTotalScore() << endl << endl;
-
-                delete game;
+                BowlingGame game;
+                game.addRoll(sequence);
+                std::cout << std::endl << "Your Final score is " << game.getTotalScore() << std::endl << std::endl;
             }
 
             system("pause");
@@ -123,57 +104,5 @@ int runProgramIntegerSequence()
     }
     catch (const std::exception& e) {
         std::cerr << "Exception occurred: " << e.what() << std::endl;
-        return 1;
     }
-    return 0;	
-}	
-//  14456/5/x017/6/x2/6
-
-
-
-int runProgramCharSequence()
-{
-
-	string sequence = "";
-	BowlingGame *game;
-try
-	{
-	while (sequence != "q") {
-
-		cout << endl << "TTL :: BOWLING GAME" << endl << endl;
-		cout << "Enter rolls sequence: 'X' - Strike and '/' - Spare (example: '-/X123456789' ) \n\n 'd' for default TEST Sequence \t, 'q' to quit)" << endl << endl;
-
-		sequence.clear();
-		cin >> sequence;
-
-		if(sequence == "d")
-			sequence = "14456/5/x017/6/x2/6"; // Default sequence for testing
-
-		if (sequence != "q" ) {
-
-			game = new BowlingGame();
-
-			if(nullptr == game) {
-				cout << "Memory allocation failed for BowlingGame." << endl;
-				return 1; // Exit if memory allocation fails
-			}
-
-			game->addRoll(sequence);
-
-			cout << endl << "Your Final score is " << game->getTotalScore() << endl << endl;
-
-			delete game;
-		}
-		else
-			cout << endl << "Closing the bowling !!!" << endl << endl;             
-
-
-		system("pause");
-	}
-	}
-catch (const std::exception& e) {
-		std::cerr << "Exception occurred: " << e.what() << std::endl;
-		return 1; // Exit if an exception occurs
-	}
 }
-
