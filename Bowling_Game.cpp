@@ -91,14 +91,14 @@ void BowlingGame::addRoll(const std::vector<int>& pinsIntSequence) {
 int BowlingGame::getTotalScore() const {
     int totalScore = 0;
 
+    std::cout << "\nBowling : Framewise Game Score:" << std::endl;
+    std::cout << "--------------------------------" << std::endl;
     for (int i = 0; i < numberOfRolls; ++i) {
         totalScore += bowlingRolls[i]->getScore();
 
         if(bowlingRolls[i]->getIfFrameComplete()) 
-            std::cout << "Roll " << i + 1 << ": " 
-                    << bowlingRolls[i]->getScore() 
-                    << " (Frame: " << bowlingRolls[i]->getFrame() + 1 << ")" 
-                    << " | Total Score: " << totalScore
+            std::cout << "Frame: " << bowlingRolls[i]->getFrame() + 1 
+                    << " | Score: " << totalScore
                     << std::endl;
     }
     return totalScore;

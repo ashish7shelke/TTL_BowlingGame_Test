@@ -24,7 +24,7 @@ int runProgramIntegerSequence()
     {
         while (input != "q") {
             cout << endl << "TTL :: BOWLING GAME" << endl << endl;
-            cout << "Enter rolls as space-separated integers (0-10, example: 1 4 4 5 6 0 5 5 10 0 1 7 3 6 10 2 6)" << endl;
+        
             cout << "Press 'n' new sequence, 'd' for default TEST Sequence, 'q' to quit" << endl << endl;
 
             sequence.clear();
@@ -44,7 +44,7 @@ int runProgramIntegerSequence()
                 int rollsInTenth = 0;
                 while (frame < 10) {
                     int num;
-                    cout << "Enter roll #" << (sequence.size() + 1) << ": ";
+                    cout << "Frame No :: " << frame + 1  <<"\tEnter roll #" << rollInFrame + 1 << ": ";
                     cin >> num;
                     if (num < 0 || num > 10) {
                         cout << "Invalid entry: " << num << ". Each roll must be between 0 and 10." << endl;
@@ -75,18 +75,21 @@ int runProgramIntegerSequence()
                         if (!tenthFrame) {
                             tenthFrame = true;
                             rollsInTenth = 1;
-							cout << "10th frame initializd " << endl;
+							rollInFrame++;
 						} else {
 							rollsInTenth++;
+							rollInFrame++;
 						}
                         // Allow up to 3 rolls in 10th frame if strike or spare
 
                         if ((rollsInTenth == 2) && ( (sequence[sequence.size()-1] == 10)  || (sequence[sequence.size()-1] + num != 10) ) ) {
                             // Open frame, only 2 rolls
+							
                             sequence.push_back(num);
                             break;
                         }
                         if (rollsInTenth == 3) {
+							rollInFrame = 0;
                             sequence.push_back(num);
                             break;
                         }
@@ -97,6 +100,7 @@ int runProgramIntegerSequence()
 			else
 			{
 				cout << endl << "Invalid Command : Closing the bowling !!!" << endl << endl;
+				return -1;
 			}
 
             if (!sequence.empty()) {
